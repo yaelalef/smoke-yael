@@ -6,16 +6,39 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(express.static(__dirname));
+// Simple rate limiting middleware
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const MAX_REQUESTS = 20; // max requests per window
 
-// Serve the main HTML file
+function rateLimit(req, res, next) {
+    const ip = req.ip || req.connection.remoteAddress;
+    const now = Date.now();
+    
+    if (!rateLimitMap.has(ip)) {
+        rateLimitMap.set(ip, []);
+    }
+    
+    const requests = rateLimitMap.get(ip).filter(time => now - time < RATE_LIMIT_WINDOW);
+    
+    if (requests.length >= MAX_REQUESTS) {
+        return res.status(429).json({ success: false, error: 'Too many requests, please try again later' });
+    }
+    
+    requests.push(now);
+    rateLimitMap.set(ip, requests);
+    next();
+}
+
+app.use(express.json());
+
+// Serve only the index.html file from root
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Run a specific test
-app.post('/run-test', (req, res) => {
+app.post('/run-test', rateLimit, (req, res) => {
     const { testName, config } = req.body;
     
     if (!testName) {
@@ -75,7 +98,7 @@ app.post('/run-test', (req, res) => {
 });
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', rateLimit, (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
