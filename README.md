@@ -51,13 +51,30 @@ Run specific test file:
 npx playwright test tests/example.spec.js
 ```
 
+**Note:** On systems without a display (like CI/headless servers), you may need to use xvfb:
+```bash
+xvfb-run npm test
+```
+
+Or configure headless mode in `playwright.config.js` or via command line:
+```bash
+npx playwright test --headless
+```
+
 ## Test Configuration
 
 The Playwright configuration is in `playwright.config.js`. It includes:
-- Support for Chromium, Firefox, and WebKit browsers
+- Support for Chromium browser (Firefox and WebKit can be enabled after installation)
 - HTML reporter for test results
 - Trace collection on first retry
 - Parallel test execution
+- **Headed mode enabled by default** (browser window visible during tests)
+
+To run in headless mode (no browser window), you can:
+1. Set `headless: true` in `playwright.config.js`
+2. Or use the command line flag: `npx playwright test --headless`
+
+**Note:** Headless mode requires the chromium headless shell to be installed via `npx playwright install`.
 
 ## Writing Tests
 
