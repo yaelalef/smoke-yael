@@ -19,6 +19,16 @@ npm install
 npx playwright install
 ```
 
+   **Note:** If you encounter issues downloading browsers, you can try:
+   ```bash
+   npx playwright install chromium
+   ```
+   
+   Or install with system dependencies:
+   ```bash
+   npx playwright install --with-deps
+   ```
+
 ## Running Tests
 
 Run all tests:
@@ -51,7 +61,12 @@ The Playwright configuration is in `playwright.config.js`. It includes:
 
 ## Writing Tests
 
-Tests are located in the `tests/` directory. Example test structure:
+Tests are located in the `tests/` directory. There are two example test files:
+
+1. **local.spec.js** - Tests that work with local HTML files (no internet required)
+2. **example.spec.js** - Example tests for external websites (requires internet access)
+
+Example test structure:
 
 ```javascript
 const { test, expect } = require('@playwright/test');
@@ -59,6 +74,20 @@ const { test, expect } = require('@playwright/test');
 test('test description', async ({ page }) => {
   await page.goto('https://example.com');
   await expect(page).toHaveTitle(/Expected Title/);
+});
+```
+
+### Testing Local HTML Files
+
+The `test-fixtures/` directory contains HTML files for local testing. Example:
+
+```javascript
+const path = require('path');
+
+test('local test', async ({ page }) => {
+  const filePath = path.join(__dirname, '..', 'test-fixtures', 'test-page.html');
+  await page.goto(`file://${filePath}`);
+  await expect(page).toHaveTitle('Test Page');
 });
 ```
 
