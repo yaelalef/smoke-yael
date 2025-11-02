@@ -22,6 +22,12 @@ app.post('/run-test', (req, res) => {
         return res.status(400).json({ success: false, error: 'Test name is required' });
     }
 
+    // Whitelist of allowed test names for security
+    const allowedTests = ['login', 'book-trip', 'booking-with-traveller', 'flight-search', 'my-bookings', 'logout'];
+    if (!allowedTests.includes(testName)) {
+        return res.status(400).json({ success: false, error: 'Invalid test name' });
+    }
+
     const testFile = path.join(__dirname, 'tests', `${testName}.spec.js`);
     
     if (!fs.existsSync(testFile)) {

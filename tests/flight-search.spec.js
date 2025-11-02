@@ -47,7 +47,7 @@ test('Flight Search Test - LHR → JFK search functionality', async ({ page }) =
   await page.waitForTimeout(1000);
   
   // Select from dropdown if available
-  const lhrOption = page.locator('text=LHR, text=London Heathrow').first();
+  const lhrOption = page.locator('text=LHR').or(page.locator('text=London Heathrow')).first();
   if (await lhrOption.isVisible({ timeout: 2000 }).catch(() => false)) {
     await lhrOption.click();
   } else {
@@ -61,7 +61,7 @@ test('Flight Search Test - LHR → JFK search functionality', async ({ page }) =
   await page.waitForTimeout(1000);
   
   // Select from dropdown if available
-  const jfkOption = page.locator('text=JFK, text=John F Kennedy').first();
+  const jfkOption = page.locator('text=JFK').or(page.locator('text=John F Kennedy')).first();
   if (await jfkOption.isVisible({ timeout: 2000 }).catch(() => false)) {
     await jfkOption.click();
   } else {

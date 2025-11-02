@@ -74,7 +74,7 @@ test('Complete Booking with Traveller - Full flow with "I\'m the traveller"', as
   
   // Look for "I'm the traveller" checkbox or button
   console.log('Looking for traveller selection');
-  const travellerCheckbox = page.locator('input[type="checkbox"]:near(:text("traveller")), button:has-text("I\'m the traveller"), label:has-text("I\'m the traveller")').first();
+  const travellerCheckbox = page.locator('input[type="checkbox"]').filter({ hasText: 'traveller' }).or(page.locator('button:has-text("I\'m the traveller")')).or(page.locator('label:has-text("I\'m the traveller")')).first();
   if (await travellerCheckbox.isVisible({ timeout: 5000 }).catch(() => false)) {
     await travellerCheckbox.click();
     console.log('Selected "I\'m the traveller"');

@@ -572,9 +572,11 @@
             buttons.forEach(btn => {
                 btn.disabled = disabled;
                 if (disabled) {
-                    btn.innerHTML = '<span class="spinner"></span><span>' + btn.querySelector('span').textContent + '</span>';
+                    const spanText = btn.querySelector('span:last-child')?.textContent || btn.querySelector('span')?.textContent || '';
+                    btn.innerHTML = '<span class="spinner"></span><span>' + spanText + '</span>';
                 } else {
-                    btn.innerHTML = '<span>' + btn.querySelector('span:last-child').textContent + '</span>';
+                    const spanText = btn.querySelector('span:last-child')?.textContent || '';
+                    btn.innerHTML = '<span>' + spanText + '</span>';
                 }
             });
         }
