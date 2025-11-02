@@ -1,0 +1,20 @@
+{
+  "name": "smoke-yael",
+  "version": "1.0.0",
+  "description": "Smoke Test Runner for Travel Booking Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui"
+  },
+  "keywords": ["playwright", "testing", "smoke-tests", "travel-booking"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "express": "^5.1.0",
+    "playwright": "^1.56.1"
+  }
+}

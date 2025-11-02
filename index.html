@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smoke Test Runner - Travel Booking Tests</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-section {
+            margin-bottom: 20px;
+        }
+
+        .config-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .config-section input,
+        .config-section select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .config-section input:focus,
+        .config-section select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .test-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .test-btn {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .test-btn:active {
+            transform: translateY(0);
+        }
+
+        .test-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .test-btn.run-all {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            font-size: 16px;
+            padding: 18px 20px;
+        }
+
+        .test-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .test-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .test-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .results-panel {
+            max-height: 600px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5568d3;
+        }
+
+        .results-area {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .results-area::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .results-area::-webkit-scrollbar-track {
+            background: #2d2d2d;
+            border-radius: 5px;
+        }
+
+        .results-area::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 5px;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 6px 10px;
+            border-left: 3px solid transparent;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .log-entry.info {
+            border-left-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .log-entry.success {
+            border-left-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            color: #4ade80;
+        }
+
+        .log-entry.error {
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+        }
+
+        .log-entry.warning {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+            color: #fbbf24;
+        }
+
+        .timestamp {
+            color: #9ca3af;
+            font-size: 11px;
+            margin-right: 8px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.running {
+            background: #f59e0b;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .status-indicator.success {
+            background: #10b981;
+        }
+
+        .status-indicator.error {
+            background: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6b7280;
+            padding: 40px;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Smoke Test Runner</h1>
+            <p>Travel Booking Application - Automated Testing Suite</p>
+        </div>
+
+        <div class="content">
+            <!-- Configuration Panel -->
+            <div class="panel">
+                <h2>⚙️ Configuration Panel</h2>
+                
+                <div class="config-section">
+                    <label for="baseUrl">Base URL:</label>
+                    <input type="text" id="baseUrl" value="https://ui-dev.gtp-staging.com/" placeholder="https://ui-dev.gtp-staging.com/">
+                </div>
+
+                <div class="config-section">
+                    <label for="username">Username / Email:</label>
+                    <input type="text" id="username" value="jskrl@jskrl.com" placeholder="jskrl@jskrl.com">
+                </div>
+
+                <div class="config-section">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" value="Test@123" placeholder="Enter password">
+                </div>
+
+                <div class="config-section">
+                    <label>Browser Settings:</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="headless" checked>
+                        <label for="headless" style="margin: 0;">Headless Mode</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="slowMo">
+                        <label for="slowMo" style="margin: 0;">Slow Motion (for debugging)</label>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <label for="timeout">Test Timeout (seconds):</label>
+                    <input type="number" id="timeout" value="60" min="30" max="300">
+                </div>
+
+                <h2 style="margin-top: 30px;">🧪 Test Suite</h2>
+                <div class="test-buttons">
+                    <button class="test-btn" onclick="runTest('login')">
+                        <span>Login with Specific Credentials</span>
+                    </button>
+                    <button class="test-btn" onclick="runTest('book-trip')">
+                        <span>Login & Book New Trip</span>
+                    </button>
+                    <button class="test-btn" onclick="runTest('booking-with-traveller')">
+                        <span>Complete Booking with Traveller</span>
+                    </button>
+                    <button class="test-btn" onclick="runTest('flight-search')">
+                        <span>Flight Search Test (LHR → JFK)</span>
+                    </button>
+                    <button class="test-btn" onclick="runTest('my-bookings')">
+                        <span>My Bookings Navigation</span>
+                    </button>
+                    <button class="test-btn" onclick="runTest('logout')">
+                        <span>User Logout Test</span>
+                    </button>
+                    <button class="test-btn run-all" onclick="runAllTests()">
+                        <span>▶ Run All Tests</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="panel results-panel">
+                <div class="results-header">
+                    <h2>📊 Test Results & Logs</h2>
+                    <div class="results-actions">
+                        <button class="action-btn" onclick="exportResults()">Export</button>
+                        <button class="action-btn" onclick="clearResults()">Clear</button>
+                    </div>
+                </div>
+                <div class="results-area" id="results">
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p>No test results yet. Run a test to see the output here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testsRunning = false;
+
+        function addLog(message, type = 'info') {
+            const resultsArea = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            // Remove empty state if exists
+            const emptyState = resultsArea.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            
+            let statusIndicator = '';
+            if (type === 'success' || type === 'error') {
+                statusIndicator = `<span class="status-indicator ${type}"></span>`;
+            }
+            
+            logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span>${statusIndicator}${message}`;
+            resultsArea.appendChild(logEntry);
+            resultsArea.scrollTop = resultsArea.scrollHeight;
+        }
+
+        async function runTest(testName) {
+            if (testsRunning) {
+                addLog('⚠️ A test is already running. Please wait...', 'warning');
+                return;
+            }
+
+            testsRunning = true;
+            disableButtons(true);
+
+            const config = getConfig();
+            addLog(`🚀 Starting test: ${testName}`, 'info');
+            addLog(`📍 Base URL: ${config.baseUrl}`, 'info');
+            addLog(`👤 Username: ${config.username}`, 'info');
+
+            try {
+                const response = await fetch('/run-test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        testName: testName,
+                        config: config
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    addLog(`✅ Test "${testName}" completed successfully!`, 'success');
+                    if (data.output) {
+                        data.output.split('\n').forEach(line => {
+                            if (line.trim()) {
+                                addLog(line, 'info');
+                            }
+                        });
+                    }
+                } else {
+                    addLog(`❌ Test "${testName}" failed!`, 'error');
+                    if (data.error) {
+                        addLog(`Error: ${data.error}`, 'error');
+                    }
+                    if (data.output) {
+                        data.output.split('\n').forEach(line => {
+                            if (line.trim()) {
+                                addLog(line, 'error');
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                addLog(`❌ Failed to run test: ${error.message}`, 'error');
+            } finally {
+                testsRunning = false;
+                disableButtons(false);
+                addLog('─'.repeat(80), 'info');
+            }
+        }
+
+        async function runAllTests() {
+            if (testsRunning) {
+                addLog('⚠️ Tests are already running. Please wait...', 'warning');
+                return;
+            }
+
+            const tests = ['login', 'book-trip', 'booking-with-traveller', 'flight-search', 'my-bookings', 'logout'];
+            
+            addLog('🎯 Starting full test suite execution...', 'info');
+            addLog('═'.repeat(80), 'info');
+
+            for (let i = 0; i < tests.length; i++) {
+                addLog(`\n📋 Test ${i + 1}/${tests.length}`, 'info');
+                await runTest(tests[i]);
+                
+                if (i < tests.length - 1) {
+                    addLog('⏳ Waiting 2 seconds before next test...', 'info');
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            }
+
+            addLog('═'.repeat(80), 'info');
+            addLog('🏁 All tests completed!', 'success');
+        }
+
+        function getConfig() {
+            return {
+                baseUrl: document.getElementById('baseUrl').value,
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value,
+                headless: document.getElementById('headless').checked,
+                slowMo: document.getElementById('slowMo').checked,
+                timeout: parseInt(document.getElementById('timeout').value)
+            };
+        }
+
+        function disableButtons(disabled) {
+            const buttons = document.querySelectorAll('.test-btn');
+            buttons.forEach(btn => {
+                btn.disabled = disabled;
+                if (disabled) {
+                    const spanText = btn.querySelector('span:last-child')?.textContent || btn.querySelector('span')?.textContent || '';
+                    btn.innerHTML = '<span class="spinner"></span><span>' + spanText + '</span>';
+                } else {
+                    const spanText = btn.querySelector('span:last-child')?.textContent || '';
+                    btn.innerHTML = '<span>' + spanText + '</span>';
+                }
+            });
+        }
+
+        function clearResults() {
+            const resultsArea = document.getElementById('results');
+            resultsArea.innerHTML = `
+                <div class="empty-state">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p>Results cleared. Run a test to see new output.</p>
+                </div>
+            `;
+        }
+
+        function exportResults() {
+            const resultsArea = document.getElementById('results');
+            const text = resultsArea.innerText;
+            
+            if (text.includes('No test results')) {
+                alert('No results to export yet!');
+                return;
+            }
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `test-results-${new Date().toISOString().slice(0, 10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            addLog('📥 Results exported successfully!', 'success');
+        }
+
+        // Live configuration updates
+        document.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('change', () => {
+                addLog('⚙️ Configuration updated', 'info');
+            });
+        });
+    </script>
+</body>
+</html>
